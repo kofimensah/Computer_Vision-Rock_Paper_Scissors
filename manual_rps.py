@@ -28,3 +28,9 @@ def get_winner(computer_choice, user_choice):
         return "Computer Wins"
     else:
         return "Try Again"
+
+def play():
+    comp_choice = get_computer_choice()
+    use_choice = get_user_choice()
+    return(get_winner(comp_choice, use_choice))
+    
