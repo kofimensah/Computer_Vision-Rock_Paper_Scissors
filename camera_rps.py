@@ -7,6 +7,10 @@ import cv2
 from keras.models import load_model
 import numpy as np
 
+
+#This cell script should include several functions to achieve the goal. The get_prediction is the name of the final thing
+
+
 def get_prediction():
 
     model = load_model('keras_model.h5')
