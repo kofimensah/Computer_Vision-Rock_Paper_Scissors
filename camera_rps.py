@@ -31,15 +31,14 @@ while True:
     data[0] = normalized_image
     prediction = model.predict(data)
     cv2.imshow('frame', frame)
-    #Press q to close the window
-    print(get_prediction(prediction))
     end = time.time()
-    e_time = 5  - (end - start)
+    e_time = round(4  - (end - start))
+    #Script will end after 3 seconds of running
     if e_time <= 0:
+        user_prediction = get_prediction(prediction)
+        print(f"You played: {user_prediction}")
         break
-    print(f"Time elapsed: {e_time}")
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    print(f"Countdown: {e_time}")
 
 #After the loop release the cap object
 cap.release()
