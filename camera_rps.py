@@ -3,7 +3,7 @@ from ctypes import resize
 from xml.etree.ElementPath import prepare_predicate
 from xmlrpc.server import list_public_methods
 
-import cv2
+import cv2, time
 from keras.models import load_model
 import numpy as np
 
@@ -21,6 +21,7 @@ def get_prediction(array):
 model = load_model('keras_model.h5')
 cap = cv2.VideoCapture(0)
 data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+start = time.time()
 
 while True:
     ret, frame = cap.read()
@@ -32,6 +33,11 @@ while True:
     cv2.imshow('frame', frame)
     #Press q to close the window
     print(get_prediction(prediction))
+    end = time.time()
+    e_time = 5  - (end - start)
+    if e_time <= 0:
+        break
+    print(f"Time elapsed: {e_time}")
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
