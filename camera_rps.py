@@ -4,9 +4,10 @@ from encodings import normalize_encoding
 from xml.etree.ElementPath import prepare_predicate
 from xmlrpc.server import list_public_methods
 
-import cv2, time, random
+import cv2, time, random, math
 from keras.models import load_model
 import numpy as np
+
 
 #Function to obtain computer choice
 def get_computer_choice():
@@ -28,9 +29,11 @@ def get_prediction(array):
 #Function to obtain user choice from webcam using openCV
 def get_user_choice():
 
+    #Initializing CV2 object and frame
     model = load_model('keras_model.h5')
     cap = cv2.VideoCapture(0)
     data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+
     start = time.time()
 
     while True:
@@ -42,9 +45,9 @@ def get_user_choice():
         prediction = model.predict(data)
         cv2.imshow('frame', frame)
         end = time.time()
-        e_time = round(4  - (end - start))
+        e_time = math.trunc(4  - (end - start))
         #Script will end after 3 seconds of running
-        if e_time <= 0:
+        if cv2.waitKey(1) and e_time <= 0:
             user_choice = get_prediction(prediction)
             print(f"You played: {user_choice}")
             break
@@ -84,8 +87,6 @@ def get_winner(computer_choice, user_choice):
         print("Try Again")
         return
 
-def user():
-    return "User Wins okay"
 
 #Play function to run entire game
 def play():
@@ -118,3 +119,11 @@ def rounds():
             print("User Won")
 
 rounds()
+
+
+"""
+Method 1: Initializes cv object and frame in script. This prevents CV object from reopening every round.
+Downside is that we lose the few seconds of pause before the next round.
+
+Method 2: The cv object and frame are initalized within the get_user_choice function. This causes the frame to restart in a split second for every round.
+"""
