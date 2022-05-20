@@ -4,7 +4,7 @@ from encodings import normalize_encoding
 from xml.etree.ElementPath import prepare_predicate
 from xmlrpc.server import list_public_methods
 
-import cv2, time, random, math
+import cv2, time, random
 from keras.models import load_model
 import numpy as np
 
@@ -14,6 +14,7 @@ def get_computer_choice():
     rps_options = ['Rock', 'Paper', 'Scissors']
     cp_choice = random.choice(rps_options)
     return cp_choice
+
 
 #Function to convert openCV output into user prediction
 def get_prediction(array):
@@ -26,6 +27,20 @@ def get_prediction(array):
     #results - fetching the item at a particular index of the RPS list
     return labels[index]
 
+def camera_write (img, text, pos, bg_color):
+   font_face = cv2.FONT_HERSHEY_SIMPLEX
+   scale = 0.4
+   color = (0, 0, 0)
+   thickness = cv2.FILLED
+   margin = 2
+   txt_size = cv2.getTextSize(text, font_face, scale, thickness)
+
+   end_x = pos[0] + txt_size[0][0] + margin
+   end_y = pos[1] - txt_size[0][1] - margin
+
+   cv2.rectangle(img, pos, (end_x, end_y), bg_color, thickness)
+   cv2.putText(img, text, pos, font_face, scale, color, 1, cv2.LINE_AA)
+
 #Function to obtain user choice from webcam using openCV
 def get_user_choice():
 
@@ -33,8 +48,10 @@ def get_user_choice():
     model = load_model('keras_model.h5')
     cap = cv2.VideoCapture(0)
     data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+    font = cv2.FONT_HERSHEY_SIMPLEX
 
     start = time.time()
+    new_time = 0
 
     while True:
         ret, frame = cap.read()
@@ -45,13 +62,18 @@ def get_user_choice():
         prediction = model.predict(data)
         cv2.imshow('frame', frame)
         end = time.time()
-        e_time = math.trunc(4  - (end - start))
+        e_time = round(4  - (end - start))
+        camera_write(frame, 'Hello World', (20,20), (255,0,0))
         #Script will end after 3 seconds of running
         if cv2.waitKey(1) and e_time <= 0:
             user_choice = get_prediction(prediction)
             print(f"You played: {user_choice}")
             break
-        print(f"Countdown: {e_time}")
+        if e_time != new_time:
+            print(f"Countdown: {e_time}")
+            new_time = e_time
+        else:
+            continue
 
     #After the loop release the cap object
     cap.release()
@@ -62,8 +84,8 @@ def get_user_choice():
 
 #Function to determine winner
 def get_winner(computer_choice, user_choice):
-    user = "User Wins OKAY"
-    comp = "Computer Wins OKAY"
+    user = "User Wins Round"
+    comp = "Computer Wins Round"
     print(f"Computer = {computer_choice}, User = {user_choice}")
     if computer_choice == "Rock" and user_choice == "Paper":
         print(user)
