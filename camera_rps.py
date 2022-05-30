@@ -1,9 +1,3 @@
-from configparser import Interpolation
-from ctypes import resize
-from encodings import normalize_encoding
-from xml.etree.ElementPath import prepare_predicate
-from xmlrpc.server import list_public_methods
-
 import cv2, time, random
 from keras.models import load_model
 import numpy as np
@@ -12,8 +6,8 @@ import numpy as np
 #Function to obtain computer choice
 def get_computer_choice():
     rps_options = ['Rock', 'Paper', 'Scissors']
-    cp_choice = random.choice(rps_options)
-    return cp_choice
+    computer_choice = random.choice(rps_options)
+    return computer_choice
 
 
 #Function to convert openCV output into user prediction
@@ -27,7 +21,8 @@ def get_prediction(array):
     #results - fetching the item at a particular index of the RPS list
     return labels[index]
 
-def camera_write (frame, text, org):
+#Function to write to OpenCV frame
+def camera_write(frame, text, position: tuple):
     # font
     font = cv2.FONT_HERSHEY_SIMPLEX
     # FontScale 
@@ -37,7 +32,7 @@ def camera_write (frame, text, org):
     #line thickness
     thickness = 2
 
-    return cv2.putText(frame, text, org, font, fontScale,color, thickness, cv2.LINE_AA, False)
+    return cv2.putText(frame, text, position, font, fontScale,color, thickness, cv2.LINE_AA, False)
 
 
 #Function to obtain user choice from webcam using openCV
@@ -59,17 +54,17 @@ def get_user_choice():
         data[0] = normalized_image
         prediction = model.predict(data)
         end = time.time()
-        e_time = round(4  - (end - start))
-        text = camera_write(frame,f"Countdown: {e_time}",(0,100))
+        elapsed_time = round(4  - (end - start))
+        text = camera_write(frame,f"Countdown: {elapsed_time}",(0,100))
         cv2.imshow('RPS Game', text)
         
         #Script will end after 3 seconds of running
-        if cv2.waitKey(1) and e_time <= 0:
+        if cv2.waitKey(1) and elapsed_time <= 0:
             user_choice = get_prediction(prediction)
             print(f"You played: {user_choice}")
             break
-        if e_time != new_time:
-            new_time = e_time
+        if elapsed_time != new_time:
+            new_time = elapsed_time
         else:
             continue
 
@@ -139,11 +134,3 @@ def rounds():
             print("User Won")
 
 rounds()
-
-
-"""
-Method 1: Initializes cv object and frame in script. This prevents CV object from reopening every round.
-Downside is that we lose the few seconds of pause before the next round.
-
-Method 2: The cv object and frame are initalized within the get_user_choice function. This causes the frame to restart in a split second for every round.
-"""
