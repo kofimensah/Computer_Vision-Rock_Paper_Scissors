@@ -37,7 +37,7 @@ def camera_write (frame, text, org):
     #line thickness
     thickness = 2
 
-    return cv2.putText(frame, text, org, font, fontScale,color, thickness, cv2.LINE_AA, True)
+    return cv2.putText(frame, text, org, font, fontScale,color, thickness, cv2.LINE_AA, False)
 
 
 #Function to obtain user choice from webcam using openCV
@@ -61,7 +61,7 @@ def get_user_choice():
         end = time.time()
         e_time = round(4  - (end - start))
         text = camera_write(frame,f"Countdown: {e_time}",(0,100))
-        cv2.imshow('frame', text)
+        cv2.imshow('RPS Game', text)
         
         #Script will end after 3 seconds of running
         if cv2.waitKey(1) and e_time <= 0:
@@ -69,9 +69,6 @@ def get_user_choice():
             print(f"You played: {user_choice}")
             break
         if e_time != new_time:
-            print(f"Countdown: {e_time}")
-            text = camera_write(frame,f"Countdown: {e_time}",(100,100))
-            cv2.imshow('frame', text)
             new_time = e_time
         else:
             continue
