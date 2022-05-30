@@ -27,19 +27,18 @@ def get_prediction(array):
     #results - fetching the item at a particular index of the RPS list
     return labels[index]
 
-def camera_write (img, text, pos, bg_color):
-   font_face = cv2.FONT_HERSHEY_SIMPLEX
-   scale = 0.4
-   color = (0, 0, 0)
-   thickness = cv2.FILLED
-   margin = 2
-   txt_size = cv2.getTextSize(text, font_face, scale, thickness)
+def camera_write (frame, text, org):
+    # font
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    # FontScale 
+    fontScale = 1.5
+    # Blue color in BGR
+    color = (255, 0,0)
+    #line thickness
+    thickness = 2
 
-   end_x = pos[0] + txt_size[0][0] + margin
-   end_y = pos[1] - txt_size[0][1] - margin
+    return cv2.putText(frame, text, org, font, fontScale,color, thickness, cv2.LINE_AA, True)
 
-   cv2.rectangle(img, pos, (end_x, end_y), bg_color, thickness)
-   cv2.putText(img, text, pos, font_face, scale, color, 1, cv2.LINE_AA)
 
 #Function to obtain user choice from webcam using openCV
 def get_user_choice():
@@ -48,7 +47,6 @@ def get_user_choice():
     model = load_model('keras_model.h5')
     cap = cv2.VideoCapture(0)
     data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-    font = cv2.FONT_HERSHEY_SIMPLEX
 
     start = time.time()
     new_time = 0
@@ -60,10 +58,11 @@ def get_user_choice():
         normalized_image = (image_np.astype(np.float32) / 127.0) - 1 #Normalize the image
         data[0] = normalized_image
         prediction = model.predict(data)
-        cv2.imshow('frame', frame)
         end = time.time()
         e_time = round(4  - (end - start))
-        camera_write(frame, 'Hello World', (20,20), (255,0,0))
+        text = camera_write(frame,f"Countdown: {e_time}",(0,100))
+        cv2.imshow('frame', text)
+        
         #Script will end after 3 seconds of running
         if cv2.waitKey(1) and e_time <= 0:
             user_choice = get_prediction(prediction)
@@ -71,6 +70,8 @@ def get_user_choice():
             break
         if e_time != new_time:
             print(f"Countdown: {e_time}")
+            text = camera_write(frame,f"Countdown: {e_time}",(100,100))
+            cv2.imshow('frame', text)
             new_time = e_time
         else:
             continue
